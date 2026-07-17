@@ -544,5 +544,5 @@ For questions about the implementation, see the Approach Document for detailed d
 
 ---
 
-**Last updated**: 2024  
+
 **Status**: Production-ready for assignment evaluation
