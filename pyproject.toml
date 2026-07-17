@@ -1,0 +1,22 @@
+[project]
+name = "tri9t_ai_assignment"
+version = "0.1.0"
+description = "Document Test Case Generation API backend"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "fastapi==0.104.1",
+    "uvicorn==0.24.0",
+    "sqlalchemy==2.0.40",
+    "pydantic==2.13.4",
+    "pydantic-core==2.46.4",
+    "pymupdf==1.28.0",
+    "pymupdf-fonts==1.0.5",
+    "python-multipart==0.0.6",
+    "httpx==0.25.1",
+    "python-dotenv==1.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

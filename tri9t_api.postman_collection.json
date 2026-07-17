@@ -1,0 +1,302 @@
+{
+  "info": {
+    "name": "Tri9T AI - Document Test Case Generation API",
+    "description": "Complete API collection for versioned document management and QA test case generation",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Document Management",
+      "item": [
+        {
+          "name": "1. Ingest PDF (v1)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "ct200_manual_v1.pdf",
+                  "disabled": false
+                },
+                {
+                  "key": "name",
+                  "value": "CT-200 Manual",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8000/documents/ingest",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["documents", "ingest"]
+            },
+            "description": "Upload and parse CT-200 manual PDF v1\n\nSaves hierarchical document structure to database"
+          },
+          "response": []
+        },
+        {
+          "name": "2. List Sections (v1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/documents/{{doc_id}}/versions/1/sections",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["documents", "{{doc_id}}", "versions", "1", "sections"]
+            },
+            "description": "Get all top-level sections from document v1\n\nReplace {{doc_id}} with response from step 1"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Specific Node",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/documents/{{doc_id}}/versions/1/nodes/{{node_id}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["documents", "{{doc_id}}", "versions", "1", "nodes", "{{node_id}}"]
+            },
+            "description": "Get full details of a specific node including children\n\nReplace {{node_id}} with any id from section list"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Search Document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/documents/{{doc_id}}/search?q=pressure&version=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["documents", "{{doc_id}}", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pressure"
+                },
+                {
+                  "key": "version",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Full-text search across document sections\n\nTry searching for: pressure, safety, warning, etc."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Test Case Generation",
+      "item": [
+        {
+          "name": "5. Create Selection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_id\": \"{{doc_id}}\",\n  \"name\": \"Safety Critical Sections\",\n  \"description\": \"All safety-related sections that need test coverage\",\n  \"node_ids\": [\"{{node_id_1}}\", \"{{node_id_2}}\", \"{{node_id_3}}\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/selections",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["selections"]
+            },
+            "description": "Create a version-pinned selection\n\nLocks to current document version (v1)\nReplace node_ids with actual IDs from step 2\n\nReturns: selection_id for next step"
+          },
+          "response": []
+        },
+        {
+          "name": "6. Generate Test Cases",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"selection_id\": \"{{selection_id}}\",\n  \"llm_provider\": \"groq\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/selections/{{selection_id}}/generate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["selections", "{{selection_id}}", "generate"]
+            },
+            "description": "Generate QA test cases using LLM\n\nCallsGroq/Gemini API to create test cases\nNote: Requires GROQ_API_KEY or GEMINI_API_KEY in environment\n\nReturns: generation_id"
+          },
+          "response": []
+        },
+        {
+          "name": "7. List All Generations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/selections/{{selection_id}}/generations",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["selections", "{{selection_id}}", "generations"]
+            },
+            "description": "Get all test case generations for a selection\n\nShows all test cases with their staleness status"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Version Management & Staleness",
+      "item": [
+        {
+          "name": "8. Ingest PDF (v2)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "ct200_manual_v2.pdf",
+                  "disabled": false
+                },
+                {
+                  "key": "name",
+                  "value": "CT-200 Manual",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8000/documents/ingest",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["documents", "ingest"]
+            },
+            "description": "Ingest updated document (v2)\n\nSystem automatically:\n1. Creates new version\n2. Matches nodes to v1 nodes\n3. Detects changes (modified, deleted, created)"
+          },
+          "response": []
+        },
+        {
+          "name": "9. Get Node Changes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/documents/{{doc_id}}/nodes/{{node_id}}/changes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["documents", "{{doc_id}}", "nodes", "{{node_id}}", "changes"]
+            },
+            "description": "See what changed for specific node between v1 and v2\n\nReturns:\n- change_type (unchanged, modified, deleted, created)\n- similarity_score\n- diff_summary"
+          },
+          "response": []
+        },
+        {
+          "name": "10. Check Staleness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/generations/{{generation_id}}/staleness-report",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["generations", "{{generation_id}}", "staleness-report"]
+            },
+            "description": "Check if test cases are stale after document v2 ingestion\n\nShows:\n- Overall staleness status\n- Per-test-case staleness\n- Confidence scores\n- Original vs current text comparison"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health & Diagnostics",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["health"]
+            },
+            "description": "Verify API is running\n\nExpected response: {\"status\": \"ok\"}"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "doc_id",
+      "value": "from-step-1-response",
+      "type": "string"
+    },
+    {
+      "key": "node_id",
+      "value": "from-step-2-response",
+      "type": "string"
+    },
+    {
+      "key": "node_id_1",
+      "value": "first-node-id",
+      "type": "string"
+    },
+    {
+      "key": "node_id_2",
+      "value": "second-node-id",
+      "type": "string"
+    },
+    {
+      "key": "node_id_3",
+      "value": "third-node-id",
+      "type": "string"
+    },
+    {
+      "key": "selection_id",
+      "value": "from-step-5-response",
+      "type": "string"
+    },
+    {
+      "key": "generation_id",
+      "value": "from-step-6-response",
+      "type": "string"
+    }
+  ]
+}
